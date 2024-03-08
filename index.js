@@ -498,6 +498,7 @@ app.put("/getintouchupdate/:id", async (req, res) => {
         GetInTouchDetails: updateUser.GetInTouchDetails,
         ContactInfoCardTitles: updateUser.ContactInfoCardTitles,
         ContactInfoCardDetails: updateUser.ContactInfoCardDetails,
+        image1: updateUser.image1
       }
   }
   const result=await getinTouchCollection.updateOne(filter,updateDoc,options);
@@ -831,6 +832,7 @@ app.put("/blog/:id", async (req, res) => {
     res.status(500).json({ error: "Error updating document" });
   }
 });
+// blog 
 app.get("/blog/:id", async (req, res) => {
   const id = req.params.id;
   const result = await blogdataCollection.findOne({ _id: new ObjectId(id) });
@@ -874,7 +876,8 @@ app.put("/contact/:id", async (req, res) => {
 
 
 
-//! about page start
+
+    //! About Code Start
     //! About Banner
     const aboutBannerCollection = client
       .db("foaDatabase")
@@ -898,6 +901,10 @@ app.put("/contact/:id", async (req, res) => {
     app.get("/getAboutBanner", async (req, res) => {
       const result = await aboutBannerCollection.find({}).toArray();
       res.json({ success: true, result });
+    });
+    app.get("/test", async (req, res) => {
+      // const result = await aboutBannerCollection.find({}).toArray();
+      res.json({ success: true, result: "Akib" });
     });
     //! About Mission
     const aboutMissionCollection = client
@@ -994,32 +1001,73 @@ app.put("/contact/:id", async (req, res) => {
       const result = await aboutTeamCollection.find({}).toArray();
       res.json({ success: true, result });
     });
-    app.put("/updateAboutTeam", async (req, res) => {
+    app.get("/getAboutTeamMember", async (req, res) => {
+      const { _id } = req.query;
+      console.log(_id);
+      const result = await aboutTeamCollection.findOne({
+        _id: new ObjectId(_id),
+      });
+      res.json({ success: true, member: result });
+    });
+    app.delete("/deleteAboutTeamMember", async (req, res) => {
       try {
-        const body = await req.body;
-        const result = await aboutTeamCollection.findOneAndReplace(
-          { _id: new ObjectId(body.id) },
-          body.data
-        );
-        console.log(body);
+        const { _id } = req.query;
+        const result = await aboutTeamCollection.deleteOne({
+          _id: new ObjectId(_id),
+        });
         res.json({ success: true, result });
       } catch (error) {
         console.log(error);
         res.json({ success: false, error });
       }
     });
-    app.post("/addAboutTeamCollection", async (req, res) => {
-      await aboutTeamCollection.insertOne({
-        name: "Sourov Modak",
-        designation: "Jr. Programmer",
-        image: "https://i.ibb.co/T0BQCmW/Profile-Picture-of-Akib-Rahman.jpg",
-        description: "I am fully dedicated",
-      });
+    app.post("/addAboutTeamMember", async (req, res) => {
+      try {
+        const data = await req.body;
+        const response = await aboutTeamCollection.insertOne(data);
+        res.json({ success: true, addedData: response });
+      } catch (error) {
+        console.log(error);
+        res.json({ success: false, error });
+      }
+    });
+    app.put("/updateAboutTeamMember", async (req, res) => {
+      try {
+        const body = await req.body;
+        const result = await aboutTeamCollection.findOneAndReplace(
+          { _id: new ObjectId(body.id) },
+          body.data
+        );
+        res.json({ success: true, result });
+      } catch (error) {
+        console.log(error);
+        res.json({ success: false, error });
+      }
     });
 
-    //! about page end 
+    //! About Delivered
+    const aboutDeliveredCollection = client
+      .db("foaDatabase")
+      .collection("about_delivered");
+    app.get("/getAboutDelivered", async (req, res) => {
+      const result = await aboutDeliveredCollection.find({}).toArray();
+      res.json({ success: true, result });
+    });
+    app.put("/updateAboutDeliveredData", async (req, res) => {
+      try {
+        const body = await req.body;
+        const result = await aboutDeliveredCollection.findOneAndReplace(
+          { _id: new ObjectId(body.id) },
+          body.data
+        );
+        res.json({ success: true, result });
+      } catch (error) {
+        console.log(error);
+        res.json({ success: false, error });
+      }
+    });
 
-          
+    //about Code End
        
 
       
